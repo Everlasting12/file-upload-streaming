@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Upload with Progress</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 2rem;
+      }
+      .progress-container {
+        width: 100%;
+        background-color: #f3f3f3;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-top: 1rem;
+      }
+      .progress-bar {
+        height: 24px;
+        background-color: #4caf50;
+        width: 0%;
+        color: white;
+        text-align: center;
+        line-height: 24px;
+        transition: width 0.3s ease;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Upload File</h2>
+    <form id="uploadForm">
+      <input type="file" id="fileInput" name="file" required />
+      <br /><br />
+      <button type="submit">Upload</button>
+    </form>
+
+    <div class="progress-container">
+      <div id="progressBar" class="progress-bar">0%</div>
+    </div>
+
+    <script>
+      const form = document.getElementById('uploadForm');
+      const progressBar = document.getElementById('progressBar');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+        if (!file) return alert('Please choose a file.');
+
+        // Reset progress UI
+        progressBar.style.width = '0%';
+        progressBar.textContent = '0%';
+
+        // Start SSE listener
+        const sse = new EventSource('http://localhost:3000/upload/progress');
+
+        sse.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          if (data.progress !== undefined) {
+            progressBar.style.width = `${data.progress}%`;
+            progressBar.textContent = `${data.progress}%`;
+          }
+          if (data.done) {
+            alert(`Upload Complete!\nFile URL: ${data.url}`);
+            sse.close();
+          }
+          if (data.error) {
+            alert('Upload failed: ' + data.message);
+            sse.close();
+          }
+        };
+
+        // Upload using `fetch`
+        const formData = new FormData();
+        formData.append('file', file);
+
+        await fetch('http://localhost:3000/upload', {
+          method: 'POST',
+          body: formData,
+        });
+      });
+    </script>
+  </body>
+</html>
