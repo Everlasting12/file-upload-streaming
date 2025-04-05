@@ -1,0 +1,11 @@
+PORT = 3000;
+MINIO_ENDPOINT = localhost;
+MINIO_PORT = 9000;
+MINIO_ROOT_USER = sidhesh; // your username you can define
+MINIO_ROOT_PASSWORD = sidhesh123; // your password you can define
+MINIO_ACCESS_KEY = YVYlosbPBO6Zq3FBB8n6; // once the minio console is up you can setup this access key and secret key
+MINIO_SECRET_KEY = zRO9esnUuGviDFE9D54KkZLCCMcRT3dsn7hMnCTu;
+MINIO_URL_EXPIRY_IN_SECONDS = 360000;
+MINIO_USE_SSL = false;
+MINIO_BUCKET = files; // your bucket name,for simplicity i have added it in envs, you can dynamically do this
+FILE_UPLOAD_STRATEGY = minio;
